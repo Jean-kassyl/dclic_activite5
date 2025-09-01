@@ -22,10 +22,16 @@ class Redacteur {
 
 
 class DatabaseManager {
-  dynamic _database;
+  static Database? _database;
 
-  Future<void> initialisation() async {
-    _database = await openDatabase(
+  Future<Database> get db async {
+    if(_database != null) return _database!;
+    _database =  await initialisation();
+    return _database!;
+  }
+
+  Future<Database> initialisation() async {
+    return  await openDatabase(
       join(await getDatabasesPath(), 'redacteurs_database.db'),
       version: 1,
       onCreate: (db, version) {
@@ -44,14 +50,16 @@ class DatabaseManager {
   }
 
   Future<void> insertRedacteur (Redacteur redacteur) async{
-      await _database.insert(
+      final database = await db;
+      await database.insert(
         'redacteurs',
         redacteur.toMap()
       );
   }
 
   Future<void> updateRedacteur(Redacteur redacteur) async {
-    await _database.update(
+    final database = await db;
+    await database.update(
       'redacteurs',
       redacteur.toMap(),
       where: 'id = ?',
@@ -60,7 +68,8 @@ class DatabaseManager {
   }
 
   Future<void> deleteRedacteur(int id) async {
-    await _database.delete(
+    final database = await db;
+    await database.delete(
       'redacteurs',
       where: 'id = ?',
       whereArgs: [id]
@@ -68,7 +77,8 @@ class DatabaseManager {
   }
 
   Future<List<Redacteur>> getAllRedacteurs() async {
-    List<Map<String, dynamic>> maps = await _database.query('redacteurs');
+    final database = await db;
+    List<Map<String, dynamic>> maps = await database.query('redacteurs');
 
     return List.generate(maps.length, (i) {
         return Redacteur(
