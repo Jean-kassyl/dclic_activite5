@@ -67,7 +67,7 @@ class DatabaseManager {
     );
   }
 
-  Future<void> deleteRedacteur(int id) async {
+  Future<void> deleteRedacteur(int? id) async {
     final database = await db;
     await database.delete(
       'redacteurs',
